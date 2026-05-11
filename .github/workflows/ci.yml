@@ -56,13 +56,8 @@ jobs:
             View run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
       - name: Send Slack notification
-        uses: slackapi/slack-github-action@v1.27.0
         if: always()
-        with:
-          payload: |
-            {
-              "text": "*[${{ job.status }}]* Newsletter Tests — `${{ github.ref_name }}`\n*Repo:* ${{ github.repository }}\n*Commit:* ${{ github.sha }}\n*Run:* ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+        run: |
+          curl -X POST "${{ secrets.SLACK_WEBHOOK_URL }}" \
+            -H "Content-Type: application/json" \
+            -d "{\"text\": \"*[${{ job.status }}]* Newsletter Tests — \`${{ github.ref_name }}\`\n*Repo:* ${{ github.repository }}\n*Commit:* \`${{ github.sha }}\`\n*Run:* ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}"
