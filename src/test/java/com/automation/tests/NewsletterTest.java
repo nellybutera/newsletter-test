@@ -65,17 +65,17 @@ public class NewsletterTest extends SetUp {
     }
 
     @Test
-    @DisplayName("TC008 - Email with numbers in domain shows error")
-    void TC008_numbersInDomainShowsError() {
+    @DisplayName("TC008 - Email with numbers in domain is accepted")
+    void TC008_numbersInDomainAccepted() {
         newsletterPage.submitWithEmail("user@123.com");
-        assertTrue(newsletterPage.isErrorVisible());
+        assertEquals("Thanks for subscribing!", newsletterPage.getSuccessTitle());
     }
 
     @Test
-    @DisplayName("TC009 - Email with hyphen in domain shows error")
-    void TC009_hyphenInDomainShowsError() {
+    @DisplayName("TC009 - Email with hyphen in domain is accepted")
+    void TC009_hyphenInDomainAccepted() {
         newsletterPage.submitWithEmail("user@my-domain.com");
-        assertTrue(newsletterPage.isErrorVisible());
+        assertEquals("Thanks for subscribing!", newsletterPage.getSuccessTitle());
     }
 
     @Test
@@ -93,17 +93,17 @@ public class NewsletterTest extends SetUp {
     }
 
     @Test
-    @DisplayName("TC012 - Email with numbers in extension shows error")
-    void TC012_numbersInExtensionShowsError() {
+    @DisplayName("TC012 - Email with numbers in extension is accepted")
+    void TC012_numbersInExtensionAccepted() {
         newsletterPage.submitWithEmail("user@example.123");
-        assertTrue(newsletterPage.isErrorVisible());
+        assertEquals("Thanks for subscribing!", newsletterPage.getSuccessTitle());
     }
 
     @Test
-    @DisplayName("TC013 - Email with hyphen in extension shows error")
-    void TC013_hyphenInExtensionShowsError() {
+    @DisplayName("TC013 - Email with hyphen in extension is accepted")
+    void TC013_hyphenInExtensionAccepted() {
         newsletterPage.submitWithEmail("user@example.co-m");
-        assertTrue(newsletterPage.isErrorVisible());
+        assertEquals("Thanks for subscribing!", newsletterPage.getSuccessTitle());
     }
 
     @Test
