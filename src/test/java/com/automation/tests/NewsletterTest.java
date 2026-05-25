@@ -3,36 +3,24 @@ package com.automation.tests;
 import com.automation.base.SetUp;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class NewsletterTest extends SetUp {
 
-    // ── Valid submissions ──────────────────────────────────────────────────
+    // ── Core valid submission ──────────────────────────────────────────────
 
     @Test
     @DisplayName("TC001 - Valid email shows success modal")
     void TC001_validEmailShowsSuccessModal() {
         newsletterPage.submitWithEmail("test@example.com");
-        assertEquals("Thanks for subscribing!", newsletterPage.getSuccessTitle());
-        assertEquals("test@example.com", newsletterPage.getConfirmedEmail());
+        assertEquals("Thanks for subscribing!", successModal.getTitle());
+        assertEquals("test@example.com", successModal.getConfirmedEmail());
     }
 
-    @Test
-    @DisplayName("TC005 - Email with numbers in username is accepted")
-    void TC005_emailWithNumbersInUsernameAccepted() {
-        newsletterPage.submitWithEmail("user123@example.com");
-        assertEquals("Thanks for subscribing!", newsletterPage.getSuccessTitle());
-    }
-
-    @Test
-    @DisplayName("TC006 - Email with underscore in username is accepted")
-    void TC006_emailWithUnderscoreInUsernameAccepted() {
-        newsletterPage.submitWithEmail("user_test@example.com");
-        assertEquals("Thanks for subscribing!", newsletterPage.getSuccessTitle());
-    }
-
-    // ── Invalid / empty input ──────────────────────────────────────────────
+    // ── Core invalid submissions ───────────────────────────────────────────
 
     @Test
     @DisplayName("TC002 - Malformed email shows error")
@@ -50,87 +38,40 @@ public class NewsletterTest extends SetUp {
         assertEquals("Valid email required", newsletterPage.getErrorMessage());
     }
 
-    @Test
-    @DisplayName("TC004 - Email with space in username shows error")
-    void TC004_emailWithSpaceInUsernameShowsError() {
-        newsletterPage.submitWithEmail("john doe@example.com");
+    // ── Valid email variations (data-driven) ──────────────────────────────
+
+    @ParameterizedTest(name = "{0}")
+    @DisplayName("Valid email variations show success modal")
+    @CsvSource({
+        "'TC005 - numbers in username',    user123@example.com",
+        "'TC006 - underscore in username', user_test@example.com",
+        "'TC008 - numbers in domain',      user@123.com",
+        "'TC009 - hyphen in domain',       user@my-domain.com",
+        "'TC012 - numbers in extension',   user@example.123",
+        "'TC013 - hyphen in extension',    user@example.co-m"
+    })
+    void validEmailVariations(String label, String email) {
+        newsletterPage.submitWithEmail(email);
+        assertEquals("Thanks for subscribing!", successModal.getTitle());
+    }
+
+    // ── Invalid email variations (data-driven) ────────────────────────────
+
+    @ParameterizedTest(name = "{0}")
+    @DisplayName("Invalid email variations show error message")
+    @CsvSource({
+        "'TC004 - space in username',       'john doe@example.com'",
+        "'TC007 - empty username',          @example.com",
+        "'TC010 - space in domain',         'user@my domain.com'",
+        "'TC011 - empty domain',            user@.com",
+        "'TC014 - space in extension',      'user@example.c om'",
+        "'TC015 - empty extension',         user@example.",
+        "'TC016 - missing @ symbol',        userexample.com",
+        "'TC017 - missing dot in domain',   user@examplecom"
+    })
+    void invalidEmailVariations(String label, String email) {
+        newsletterPage.submitWithEmail(email);
         assertTrue(newsletterPage.isErrorVisible());
-    }
-
-    @Test
-    @DisplayName("TC007 - Email with empty username shows error")
-    void TC007_emptyUsernameShowsError() {
-        newsletterPage.submitWithEmail("@example.com");
-        assertTrue(newsletterPage.isErrorVisible());
-    }
-
-    @Test
-    @DisplayName("TC008 - Email with numbers in domain is accepted")
-    void TC008_numbersInDomainAccepted() {
-        newsletterPage.submitWithEmail("user@123.com");
-        assertEquals("Thanks for subscribing!", newsletterPage.getSuccessTitle());
-    }
-
-    @Test
-    @DisplayName("TC009 - Email with hyphen in domain is accepted")
-    void TC009_hyphenInDomainAccepted() {
-        newsletterPage.submitWithEmail("user@my-domain.com");
-        assertEquals("Thanks for subscribing!", newsletterPage.getSuccessTitle());
-    }
-
-    @Test
-    @DisplayName("TC010 - Email with space in domain shows error")
-    void TC010_spaceInDomainShowsError() {
-        newsletterPage.submitWithEmail("user@my domain.com");
-        assertTrue(newsletterPage.isErrorVisible());
-    }
-
-    @Test
-    @DisplayName("TC011 - Email with empty domain shows error")
-    void TC011_emptyDomainShowsError() {
-        newsletterPage.submitWithEmail("user@.com");
-        assertTrue(newsletterPage.isErrorVisible());
-    }
-
-    @Test
-    @DisplayName("TC012 - Email with numbers in extension is accepted")
-    void TC012_numbersInExtensionAccepted() {
-        newsletterPage.submitWithEmail("user@example.123");
-        assertEquals("Thanks for subscribing!", newsletterPage.getSuccessTitle());
-    }
-
-    @Test
-    @DisplayName("TC013 - Email with hyphen in extension is accepted")
-    void TC013_hyphenInExtensionAccepted() {
-        newsletterPage.submitWithEmail("user@example.co-m");
-        assertEquals("Thanks for subscribing!", newsletterPage.getSuccessTitle());
-    }
-
-    @Test
-    @DisplayName("TC014 - Email with space in extension shows error")
-    void TC014_spaceInExtensionShowsError() {
-        newsletterPage.submitWithEmail("user@example.c om");
-        assertTrue(newsletterPage.isErrorVisible());
-    }
-
-    @Test
-    @DisplayName("TC015 - Email with empty extension shows error")
-    void TC015_emptyExtensionShowsError() {
-        newsletterPage.submitWithEmail("user@example.");
-        assertTrue(newsletterPage.isErrorVisible());
-    }
-
-    @Test
-    @DisplayName("TC016 - Email missing @ symbol shows error")
-    void TC016_missingAtSymbolShowsError() {
-        newsletterPage.submitWithEmail("userexample.com");
-        assertTrue(newsletterPage.isErrorVisible());
-    }
-
-    @Test
-    @DisplayName("TC017 - Email missing dot before extension shows error")
-    void TC017_missingDotBeforeExtensionShowsError() {
-        newsletterPage.submitWithEmail("user@examplecom");
-        assertTrue(newsletterPage.isErrorVisible());
+        assertEquals("Valid email required", newsletterPage.getErrorMessage());
     }
 }
