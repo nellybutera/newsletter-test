@@ -132,12 +132,41 @@ jobs:
 
       - name: Send Slack notification
         if: always()
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          JOB_STATUS:        ${{ job.status }}
+          REF_NAME:          ${{ github.ref_name }}
+          REPOSITORY:        ${{ github.repository }}
+          COMMIT_SHA:        ${{ steps.test_results.outputs.commit_sha }}
+          TOTAL:             ${{ steps.test_results.outputs.total }}
+          PASSED:            ${{ steps.test_results.outputs.passed }}
+          FAILED:            ${{ steps.test_results.outputs.failed }}
+          SKIPPED:           ${{ steps.test_results.outputs.skipped }}
+          RUN_URL:           ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          FAILING_TESTS:     ${{ steps.test_results.outputs.failing_tests_raw }}
         run: |
-          if [ "${{ job.status }}" = "success" ]; then
-            DETAIL="All tests passed."
-          else
-            DETAIL="*Failing Tests:*\n${{ steps.test_results.outputs.failing_tests_json }}"
-          fi
-          curl -X POST "${{ secrets.SLACK_WEBHOOK_URL }}" \
-            -H "Content-Type: application/json" \
-            -d "{\"text\": \"*[${{ job.status }}]* Newsletter Tests — \`${{ github.ref_name }}\`\n*Repo:* ${{ github.repository }} | *Commit:* \`${{ steps.test_results.outputs.commit_sha }}\`\n*Total:* ${{ steps.test_results.outputs.total }} | *Passed:* ${{ steps.test_results.outputs.passed }} | *Failed:* ${{ steps.test_results.outputs.failed }} | *Skipped:* ${{ steps.test_results.outputs.skipped }}\n${DETAIL}\n*Run:* ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}"
+          python3 - << 'EOF'
+          import os, json, urllib.request
+
+          status   = os.environ["JOB_STATUS"]
+          emoji    = "✅" if status == "success" else "❌"
+          detail   = "All tests passed." if status == "success" else f"*Failing tests:*\n{os.environ['FAILING_TESTS']}"
+
+          text = (
+            f"{emoji} *[{status.upper()}]* Newsletter Tests — `{os.environ['REF_NAME']}`\n"
+            f"*Repo:* {os.environ['REPOSITORY']} | *Commit:* `{os.environ['COMMIT_SHA']}`\n"
+            f"*Total:* {os.environ['TOTAL']} | *Passed:* {os.environ['PASSED']} "
+            f"| *Failed:* {os.environ['FAILED']} | *Skipped:* {os.environ['SKIPPED']}\n"
+            f"{detail}\n"
+            f"*Run:* {os.environ['RUN_URL']}"
+          )
+
+          payload = json.dumps({"text": text})
+          req = urllib.request.Request(
+            os.environ["SLACK_WEBHOOK_URL"],
+            data=payload.encode(),
+            headers={"Content-Type": "application/json"}
+          )
+          with urllib.request.urlopen(req) as resp:
+            print(resp.read().decode())
+          EOF
