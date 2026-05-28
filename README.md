@@ -11,19 +11,21 @@ Automated end-to-end tests for the [newsletter sign-up form](https://nellybutera
 | JUnit 5 | 5.10.2 | Test framework & parameterized tests |
 | Maven | 3.x | Build and dependency management |
 | SLF4J + Logback | 2.0.9 / 1.4.14 | Logging |
-| Allure | 2.25.0 | HTML test reporting |
 
 ## Project Structure
 
 ```
 src/
 ├── main/java/com/automation/pages/
-│   ├── BasePage.java           # Shared WebDriver + WebDriverWait base
-│   ├── NewsletterPage.java     # Page Object for the sign-up form
-│   └── SuccessModal.java       # Page Object for the success confirmation modal
-└── test/java/com/automation/
-    ├── base/SetUp.java          # Browser lifecycle + per-test TestWatcher
-    └── tests/NewsletterTest.java   # 17 test cases (TC001–TC017)
+│   ├── BasePage.java              # Shared WebDriver + WebDriverWait base
+│   ├── NewsletterPage.java        # Page Object for the sign-up form
+│   └── SuccessModal.java          # Page Object for the success confirmation modal
+└── test/
+    ├── java/com/automation/
+    │   ├── base/SetUp.java         # Browser lifecycle + per-test TestWatcher
+    │   └── tests/NewsletterTest.java  # 17 test cases (TC001–TC017)
+    └── resources/
+        └── logback-test.xml        # Logging configuration for test runs
 ```
 
 ## Running Tests
@@ -37,10 +39,6 @@ mvn test -Dheadless=true
 
 # Firefox, headless
 mvn test -Dbrowser=firefox -Dheadless=true
-
-# Generate Allure HTML report (after running tests)
-mvn allure:report
-# Open: target/site/allure-maven-plugin/index.html
 ```
 
 ## Test Cases

@@ -53,6 +53,7 @@ public class NewsletterTest extends SetUp {
     void validEmailVariations(String label, String email) {
         newsletterPage.submitWithEmail(email);
         assertEquals("Thanks for subscribing!", successModal.getTitle());
+        assertEquals(email, successModal.getConfirmedEmail());
     }
 
     // ── Invalid email variations (data-driven) ────────────────────────────
