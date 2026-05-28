@@ -58,6 +58,7 @@ public class NewsletterTest extends SetUp {
 
     // ── Invalid email variations (data-driven) ────────────────────────────
 
+    // separate test data from test logic
     @ParameterizedTest(name = "{0}")
     @DisplayName("Invalid email variations show error message")
     @CsvSource({
