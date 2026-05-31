@@ -1,0 +1,9 @@
+label,email
+TC004 - space in username,"john doe@example.com"
+TC007 - empty username,@example.com
+TC010 - space in domain,"user@my domain.com"
+TC011 - empty domain,user@.com
+TC014 - space in extension,"user@example.c om"
+TC015 - empty extension,user@example.
+TC016 - missing @ symbol,userexample.com
+TC017 - missing dot in domain,user@examplecom

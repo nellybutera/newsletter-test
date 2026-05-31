@@ -1,0 +1,7 @@
+label,email
+TC005 - numbers in username,user123@example.com
+TC006 - underscore in username,user_test@example.com
+TC008 - numbers in domain,user@123.com
+TC009 - hyphen in domain,user@my-domain.com
+TC012 - numbers in extension,user@example.123
+TC013 - hyphen in extension,user@example.co-m
