@@ -58,6 +58,14 @@
             <version>${logback.version}</version>
         </dependency>
 
+        <!-- Allure annotations (@Epic, @Feature, @Story, @Description, @Severity) -->
+        <dependency>
+            <groupId>io.qameta.allure</groupId>
+            <artifactId>allure-junit5</artifactId>
+            <version>2.25.0</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
     <build>
